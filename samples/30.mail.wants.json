@@ -1,0 +1,9 @@
+{
+  "$": {
+    "from"    : true,
+    "name"    : true,
+    "to"      : true,
+    "subject" : true,
+    "message" : true
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$": {
+    "first"  : true,
+    "last"   : true,
+    "age"    : true,
+    "gender" : true
+  },
+
+  "#": {
+    "delete"  : true,
+    "suspend" : true
+  },
+
+  "~": {
+    "leave" : true
+  },
+  
+  "&": {
+    "groups" : 5,
+    "logins" : 3
+  }, 
+  
+  "@": {
+    "errors" : 4
+  }
+}

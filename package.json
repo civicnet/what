@@ -1,0 +1,27 @@
+{
+  "name": "@civictech/what",
+  "version": "1.0.0",
+  "description": "A stable, balanced template engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/civictechro/what.git"
+  },
+  "keywords": [
+    "template"
+  ],
+  "author": "civictechᴿᴼ",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/civictechro/what/issues"
+  },
+  "homepage": "https://github.com/civictechro/what#readme",
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-plugin-jest": "^21.15.0",
+    "jest": "^22.4.3"
+  }
+}

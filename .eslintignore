@@ -1,0 +1,7 @@
+/node_modules/
+/coverage/
+
+/samples/*.in.js
+/samples/*.out
+/samples/*.wants.json
+/samples/*.what

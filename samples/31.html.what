@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Account information</title>
+  </head>
+  <body>
+    <div>
+      <p>
+        <span>First name:</span> <span>[$first]</span>
+        <span>Last name:</span> <span>[$last]</span>
+        <span>Age:</span> <span>[$age]</span>
+        <span>Gender:</span> <span>[$gender]</span>
+    </div>
+    <div>
+      <p>
+        <span>Groups:</span>
+      <p>
+        <ul>[&groups:5]
+          <li><span>[&.name]</span> from <a href="[~leave]?[&.id]">Leave</a></li>[&]
+        </ul>
+    </div>
+    <div>
+      <p>
+        <span>Recent logins:</span>
+      <p>
+        <ul>[&logins:3]
+          <li><span>[&.date]</span> from <span>[&.ip]</span></li>[!]
+          <li>None</li>[&]
+        </ul>
+    </div>
+    <div>
+      <p>
+        <span>Last error:</span> [@errors]<strong>[@.message]</strong>[@]
+      <p>
+        <span>Other errors:</span>
+        <ul>[@errors:3]
+          <li><strong>[@.message]</strong></li>[!]
+          <li>None</li>[@]
+        </ul>
+    </div>
+    <div>
+      <p>
+        <span>Other actions:</span> <a href="[#suspend]">Suspend account</a> <a href="[#delete]">Delete account</a>
+    </div>
+  </body>
+</html>

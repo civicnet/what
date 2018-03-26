@@ -1,0 +1,12 @@
+CONNECT
+HELO
+MAIL FROM: <aaron@example.com>
+RCPT TO: <barbara@example.com>
+DATA
+From: Aaron <aaron@example.com>
+Subject: Test
+To: <barbara@example.com>
+
+This is a test message.
+.
+QUIT

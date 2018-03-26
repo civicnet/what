@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Account information</title>
+  </head>
+  <body>
+    <div>
+      <p>
+        <span>First name:</span> <span>John</span>
+        <span>Last name:</span> <span>Doe</span>
+        <span>Age:</span> <span>35</span>
+        <span>Gender:</span> <span>male</span>
+    </div>
+    <div>
+      <p>
+        <span>Groups:</span>
+      <p>
+        <ul>
+          <li><span>Publishers</span> from <a href="/group/leave?publishers">Leave</a></li>
+          <li><span>Moderators</span> from <a href="/group/leave?moderators">Leave</a></li>
+          <li><span>Curators</span> from <a href="/group/leave?curators">Leave</a></li>
+        </ul>
+    </div>
+    <div>
+      <p>
+        <span>Recent logins:</span>
+      <p>
+        <ul>
+          <li><span>Sat, 24 Mar 2018 09:45:00 GMT</span> from <span>192.168.1.102</span></li>
+          <li><span>Fri, 23 Mar 2018 09:45:00 GMT</span> from <span>192.168.1.102</span></li>
+          <li><span>Thu, 22 Mar 2018 09:45:00 GMT</span> from <span>192.168.1.102</span></li>
+        </ul>
+    </div>
+    <div>
+      <p>
+        <span>Last error:</span> <strong>File not found</strong>
+      <p>
+        <span>Other errors:</span>
+        <ul>
+          <li>None</li>
+        </ul>
+    </div>
+    <div>
+      <p>
+        <span>Other actions:</span> <a href="/account/suspend">Suspend account</a> <a href="/account/delete">Delete account</a>
+    </div>
+  </body>
+</html>

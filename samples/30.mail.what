@@ -1,0 +1,12 @@
+CONNECT
+HELO
+MAIL FROM: <[$from]>
+RCPT TO: <[$to]>
+DATA
+From: [$name] <[$from]>
+Subject: [$subject]
+To: <[$to]>
+
+[$message]
+.
+QUIT
