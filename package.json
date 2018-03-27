@@ -1,13 +1,13 @@
 {
   "name": "@civictech/what",
   "version": "1.0.0",
-  "engines" : {
-    "node" : ">=8.9.4"
+  "engines": {
+    "node": ">=8.9.4"
   },
   "description": "A stable, balanced template engine",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage && cat coverage/lcov.info | node node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/civictechro/what#readme",
   "devDependencies": {
+    "coveralls": "^3.0.0",
     "eslint": "^4.19.1",
     "eslint-plugin-jest": "^21.15.0",
     "jest": "^22.4.3"
