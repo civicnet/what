@@ -3,16 +3,17 @@
 const GeneratorFunction = (function * gen(){ return gen.constructor; })().next().value;
 
 function template(...data) {
-  return this.reduce((a, t) => {
-    if (t instanceof GeneratorFunction) {
-      for (const f of t.call(...data)) { try { a += `${f || ''}` } catch (e) { } }
-      return a;
+  return this.map((part) => {
+    if (part instanceof GeneratorFunction) {
+      return [ ...part.call(...data) ].map((bit) => {
+        try { return `${bit || ''}`; } catch (e) { return ''; }
+      }).join('');
     }
-    if (t instanceof Function) {
-      try { return a + `${t.call(...data) || ''}`; } catch (e) { return a; }
+    if (part instanceof Function) {
+      part = part.call(...data);
     }
-    return a + t;
-  }, '');
+    try { return `${part || ''}`; } catch (e) { return ''; }
+  }).join('');
 }
 
 function walk(path) {
@@ -86,13 +87,8 @@ function compile(source = '') {
             if (sel && (sel.constructor === GeneratorFunction.prototype)) {
               let count;
               for (count = 0; count < max; ++count) {
-                try {
-                  let w = sel.next(); if (w.done) { break; } 
-                  yield template.call(local, this, w.value);
-                }
-                catch (e) {
-                  yield '';
-                }
+                let w = sel.next(); if (w.done) { break; } 
+                yield template.call(local, this, w.value);
               }
               if (!count) {
                 if (local[Not] instanceof Function) { yield local[Not].call(this); }
@@ -116,9 +112,7 @@ function compile(source = '') {
 
       if (path.length) {
         function get() {
-          return (item) => {
-            try { return `${walk.call(item, path) || ''}`; } catch (e) { return ''; }
-          };
+          return (item) => walk.call(item, path);
         }
 
         super('return this();');

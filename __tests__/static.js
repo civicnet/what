@@ -11,13 +11,13 @@ const Anything = [ ,
   undefined, null,
   false, true,
   NaN, -Infinity, +Infinity, 0, 1, Math.PI, Number(42),
-  '', '\0', ' ', 'A', 'B', '\u2665', String(), String('S'),
+  '', '\0', ' ', 'A', 'B', '\u2665', String(),
   'constructor', 'prototype',
-  Symbol(), Symbol('sym'), // eslint-disable-line symbol-description
-  [], {}, this, Object, Object.create(null), new Error('A'),
-  new Function(), () => { throw new Error('B'); }, // eslint-disable-line no-new-func
-  function () { throw new Error('C'); }, async function () { throw new Error('D'); },
-  function * () { throw new Error('E'); }, (function * () { throw new Error('F'); })()
+  Symbol(), Symbol('Sym'), // eslint-disable-line symbol-description
+  [], {}, this, Object, Object.create(null), new Error(),
+  new Function(), () => { }, // eslint-disable-line no-new-func, no-empty-function
+  function () { }, async function () { }, // eslint-disable-line no-empty-function
+  function * () { }, (function * () { })() // eslint-disable-line no-empty-function
 ];
 
 it('exists', () => {
@@ -179,6 +179,28 @@ describe('immediate', () => {
       }
     }
   });
+    
+  it('errors', (done) => {
+    expect.assertions(Immediate.length * Anything.length);
+
+    for (const i of Immediate) {
+      const template = compile(i);
+
+      for (const err of Anything) {
+        const data = { get value() { throw err; } };
+
+        try {
+          template({ '$': data });
+          done.fail('Did not throw');
+        }
+        catch (e) {
+          expect(e).toBe(err);
+        }
+      }
+        
+      done();
+    }
+  });
 });
 
 describe('action', () => {
@@ -234,6 +256,26 @@ describe('action', () => {
         expect(template({ [op]: { [key]: value } })).toMatchSnapshot();
       }
     }
+  });
+
+  it('errors', (done) => {
+    for (const [ t, [ op, key ] ] of Object.entries(Actions)) {
+      const template = compile(t);
+
+      for (const err of Anything) {
+        const data = { get [key]() { throw err; } };
+
+        try {
+          template({ [op]: data });
+          done.fail('Did not throw');
+        }
+        catch (e) {
+          expect(e).toBe(err);
+        }
+      }
+    }
+    
+    done();
   });
 });
 
@@ -307,6 +349,26 @@ describe('tag', () => {
         expect(template({ [op]: { [key]: value } })).toMatchSnapshot();
       }
     }
+  });
+
+  it('errors', (done) => {
+    for (const [ t, [ op, key ] ] of Object.entries(Tags)) {
+      const template = compile(t);
+
+      for (const err of Anything) {
+        const data = { get [key]() { throw err; } };
+
+        try {
+          template({ [op]: data });
+          done.fail('Did not throw');
+        }
+        catch (e) {
+          expect(e).toBe(err);
+        }
+      }
+    }
+    
+    done();
   });
 });
 
@@ -464,15 +526,13 @@ describe('tail', () => {
     });
 
     test('generators', () => {
-      const live = (function * () {
-        yield { '': 'O' };
-        yield { '': 'K' };
-        throw new Error('T');
-      })();
-      
+      const live = (function * () { yield; throw new Error(); })();
+
+      function run() { compile('[@stream]')({ '@': { stream: live } }); }
+
       expect(compile.consumable(live)).toBe(true);
-      expect(compile('[@breaks:3][@.]')({ '@': { breaks: live } })).toBe('OK');
-      expect(live.next().done).toBeTruthy();
+      expect(run).not.toThrow();
+      expect(run).toThrow();
 
       for (const [ t, [ op, ...key ] ] of Object.entries(Tails)) {
         const template = compile(t);
@@ -494,13 +554,12 @@ describe('tail', () => {
           expect(live.next().done).toBeTruthy();
         }
 
-        for (const value of Anything) {
-          const live = (function * () { throw value; })();
+        for (const err of Anything) {
+          const live = (function * () { throw err; })();
           const data = key.reduceRight((child, parent) => ({ [parent] : child }), live);
           
           expect(compile.consumable(live)).toBe(true);
-          expect(template({ [op]: data })).toBe(EmptyString);
-          expect(live.next().done).toBeTruthy();
+          try { template({ [op]: data }); } catch (e) { expect(e).toBe(err); }
         }
       }
     });
@@ -516,5 +575,64 @@ describe('tail', () => {
         expect(template({ [op]: { [key]: value } })).toMatchSnapshot();
       }
     }
+  });
+
+  describe('errors', () => {
+    test('property', (done) => {
+      const safe = compile('[&value:0][&.prop]');
+      const bail = compile('[&value][&.prop]');
+
+      for (const err of Anything) {
+        const data = () => ({ value: [ { get prop() { throw err; } } ] });
+
+        expect(safe({ '&': data() })).toBe(EmptyString);
+
+        try {
+          bail({ '&': data() });
+          done.fail('Did not throw');
+        }
+        catch (e) {
+          expect(e).toBe(err);
+        }
+      }
+
+      done();
+    });
+
+    test('control', (done) => {
+      for (const err of Anything) {
+        try {
+          compile('[@value]')({ '@': { get value() { throw err; } } });
+          done.fail('Did not throw');
+        }
+        catch (e) {
+          expect(e).toBe(err);
+        }
+      }
+
+      done();
+    });
+
+    test('generators', (done) => {
+      for (const [ t, [ op, ...key ] ] of Object.entries(Tails)) {
+        const template = compile(t);
+
+        for (const err of Anything) {
+          const live = (function * () { throw err; })();
+          const data = key.reduceRight((child, parent) => ({ [parent] : child }), live);
+          
+          expect(compile.consumable(live)).toBe(true);
+          try {
+            template({ [op]: data });
+            done.fail('Did not throw');
+          }
+          catch (e) {
+            expect(e).toBe(err);
+          }
+        }
+      }
+          
+      done();
+    });
   });
 });
