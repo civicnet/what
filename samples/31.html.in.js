@@ -23,10 +23,10 @@ module.exports = () => ({
     ],
 
     'logins': [
-      { date: new Date('2018-03-24 11:45:00').toUTCString(), ip: '192.168.1.102' },
-      { date: new Date('2018-03-23 11:45:00').toUTCString(), ip: '192.168.1.102' },
-      { date: new Date('2018-03-22 11:45:00').toUTCString(), ip: '192.168.1.102' },
-      { date: new Date('2018-03-21 11:45:00').toUTCString(), ip: '192.168.1.102' }
+      { date: new Date('2018-03-24T09:45:00Z').toUTCString(), ip: '192.168.1.102' },
+      { date: new Date('2018-03-23T09:45:00Z').toUTCString(), ip: '192.168.1.102' },
+      { date: new Date('2018-03-22T09:45:00Z').toUTCString(), ip: '192.168.1.102' },
+      { date: new Date('2018-03-21T09:45:00Z').toUTCString(), ip: '192.168.1.102' }
     ]
   }, 
   
