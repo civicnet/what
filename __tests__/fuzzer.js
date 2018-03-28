@@ -5,7 +5,7 @@ const compile = require('../index');
 const Relevant = [
   '', '\0', ' ', 'plain', '$value', '\u2665',
   'nested.property.with.somewhat.long.path.specifier',
-  '[', ']', '$', '#', '~', ':', '%', '@', '&', '!', '/', '|', '.'
+  '[', ']', '$', '_', '#', '~', ':', '%', '@', '&', '!', '/', '|', '.'
 ];
 
 // eslint-disable-next-line no-sparse-arrays, array-bracket-newline
