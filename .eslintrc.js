@@ -61,7 +61,7 @@ module.exports = {
         "dot-notation": [
             "error",
             {
-                "allowPattern": "^\\$$"
+                "allowPattern": "^(\\$|_)$"
             }
         ],
         "eol-last": "error",

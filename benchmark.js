@@ -6,7 +6,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const samples = path.join(__dirname, 'samples');
-const time    = parseInt(process.argv[2]) || 5000; // ms/test
+const time    = parseInt(process.argv[2] / 2) || 5000; // ms/test
 
 function human(size) {
   const UNIT = [ ' \x1b[2;37mB', '\x1b[2;32mkB', '\x1b[2;36mMB', '\x1b[2;34mGB', '\x1b[2;31mTB' ];

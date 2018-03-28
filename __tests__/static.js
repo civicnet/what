@@ -14,7 +14,8 @@ const Anything = [ ,
   '', '\0', ' ', 'A', 'B', '\u2665', String(),
   'constructor', 'prototype',
   Symbol(), Symbol('Sym'), // eslint-disable-line symbol-description
-  [], {}, this, Object, Object.create(null), new Error(),
+  [], {}, Object.create(null), Object.freeze(Object.create(null)),
+  new Error(), class { }, 
   new Function(), () => { }, // eslint-disable-line no-new-func, no-empty-function
   function () { }, async function () { }, // eslint-disable-line no-empty-function
   function * () { }, (function * () { })() // eslint-disable-line no-empty-function
@@ -58,9 +59,9 @@ it('holds', () => {
 
 describe('immediate', () => {
   const Basic    = '[$value]';
-  const Default  = '[$value|Default]';
-  const Multiple = '[$value|$other]';
-  const Full     = '[$value|$other|Default]';
+  const Default  = '[$value|etc]';
+  const Multiple = '[$value|_other]';
+  const Full     = '[$value|_other|etc]';
 
   const Immediate = [ Basic, Default, Multiple, Full ];
 
@@ -101,10 +102,10 @@ describe('immediate', () => {
       expect(Object.keys(template.wants['$'])).toHaveLength(1);
       expect(template.wants['$'].value).toBeTruthy();
 
-      expect(template()).toBe('Default');
+      expect(template()).toBe('etc');
 
       for (const value of Anything) {
-        expect(template({ '$': { value } })).toBe(first(value, 'Default'));
+        expect(template({ '$': { value } })).toBe(first(value, 'etc'));
       }
     });
 
@@ -112,11 +113,13 @@ describe('immediate', () => {
       const template = compile(Multiple);
 
       expect(template.wants).toBeInstanceOf(Object);
-      expect(Object.keys(template.wants)).toHaveLength(1);
+      expect(Object.keys(template.wants)).toHaveLength(2);
       expect(template.wants['$']).toBeInstanceOf(Object);
-      expect(Object.keys(template.wants['$'])).toHaveLength(2);
+      expect(template.wants['_']).toBeInstanceOf(Object);
+      expect(Object.keys(template.wants['$'])).toHaveLength(1);
+      expect(Object.keys(template.wants['_'])).toHaveLength(1);
       expect(template.wants['$'].value).toBeTruthy();
-      expect(template.wants['$'].other).toBeTruthy();
+      expect(template.wants['_'].other).toBeTruthy();
 
       expect(template()).toBe(EmptyString);
 
@@ -124,8 +127,8 @@ describe('immediate', () => {
         expect(template({ '$': { value } })).toBe(first(value));
 
         for (const other of Anything) {
-          expect(template({ '$': { other } })).toBe(first(other));
-          expect(template({ '$': { other, value } })).toBe(first(value, other));
+          expect(template({ '_': { other } })).toBe(first(other));
+          expect(template({ '$': { value }, '_': { other } })).toBe(first(value, other));
         }
       }
     });
@@ -134,26 +137,28 @@ describe('immediate', () => {
       const template = compile(Full);
 
       expect(template.wants).toBeInstanceOf(Object);
-      expect(Object.keys(template.wants)).toHaveLength(1);
+      expect(Object.keys(template.wants)).toHaveLength(2);
       expect(template.wants['$']).toBeInstanceOf(Object);
-      expect(Object.keys(template.wants['$'])).toHaveLength(2);
+      expect(template.wants['_']).toBeInstanceOf(Object);
+      expect(Object.keys(template.wants['$'])).toHaveLength(1);
+      expect(Object.keys(template.wants['_'])).toHaveLength(1);
       expect(template.wants['$'].value).toBeTruthy();
-      expect(template.wants['$'].other).toBeTruthy();
+      expect(template.wants['_'].other).toBeTruthy();
 
-      expect(template()).toBe('Default');
+      expect(template()).toBe('etc');
 
       for (const value of Anything) {
-        expect(template({ '$': { value } })).toBe(first(value, 'Default'));
+        expect(template({ '$': { value } })).toBe(first(value, 'etc'));
 
         for (const other of Anything) {
-          expect(template({ '$': { other } })).toBe(first(other, 'Default'));
-          expect(template({ '$': { other, value } })).toBe(first(value, other, 'Default'));
+          expect(template({ '_': { other } })).toBe(first(other, 'etc'));
+          expect(template({ '$': { value }, '_': { other } })).toBe(first(value, other, 'etc'));
         }
       }
     });
 
     test('others', () => {
-      expect(compile('[$value|Default|Comment]')()).toBe('Default');
+      expect(compile('[$value|etc|ignored]')()).toBe('etc');
       
       for (const value of Anything) {
         expect(compile('[$]')({ '$': { '': value } })).toBe(first(value));

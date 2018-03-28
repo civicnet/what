@@ -5,9 +5,7 @@ const GeneratorFunction = (function * gen(){ return gen.constructor; })().next()
 function template(...data) {
   return this.map((part) => {
     if (part instanceof GeneratorFunction) {
-      return [ ...part.call(...data) ].map((bit) => {
-        try { return `${bit || ''}`; } catch (e) { return ''; }
-      }).join('');
+      return [ ...part.call(...data) ].map((bit) => `${bit || ''}`).join('');
     }
     if (part instanceof Function) {
       part = part.call(...data);
@@ -31,17 +29,21 @@ function compile(source = '') {
     wants[op][key] = (count === undefined) ? true : ((wants[op][key] || 0) + count);
   }
 
-  class Immediate extends Function { /* $ */ 
+  class Immediate extends Function {
     constructor(op, body) {
       const literal = (l) => JSON.stringify(l);
-      const field   = (f) => (want(op, f), `(this['${op}'] || {})[${literal(f)}]`);
-      const token   = (t) => ((t[0] === op) ? field(t.substring(1)) : literal(t));
+      const field   = (reg, f) => (want(reg, f), `(this['${reg}'] || {})[${literal(f)}]`);
+
+      function token(t) {
+        const [ reg ] = t;
+        return ['$', '_' ].includes(reg) ? field(reg, t.substring(1)) : literal(t);
+      }
 
       super(`return ${`${op}${body}`.split('|').map(token).join('||')};`);
     }
   }
   
-  class Action extends Function { /* # ~ */ 
+  class Action extends Function {
     constructor(op, body) {
       wants[op] = (wants[op] || {}); wants[op][body] = true;
 
@@ -49,7 +51,7 @@ function compile(source = '') {
     }
   }
 
-  class Tags extends Action { /* : % / */ 
+  class Tag extends Action {
     constructor(op, body) {
       super(op, `${op}${body}`);
     }
@@ -57,7 +59,7 @@ function compile(source = '') {
 
   const Not = Symbol('Not');
   
-  class Tail extends Function { /* @ */ 
+  class Tail extends Function {
     constructor(op, body) {
       if (!body) { collect = tokens; super(`return '';`); return this; }
       
@@ -136,7 +138,7 @@ function compile(source = '') {
     }
   }
 
-  class Else extends Function { /* ! */
+  class Else extends Function {
     constructor() {
       const local = [], target = collect; collect = local;
 
@@ -152,28 +154,29 @@ function compile(source = '') {
     }
   }
 
-  const scan = /\[(\$|#|~|:|%|\/|@|!|&)(.*?)\]/g;
+  const scan = /\[(\$|_|#|~|:|%|\/|@|!|&)(.*?)\]/g;
   let last = 0;
   for (let found = scan.exec(source); found; found = scan.exec(source)) {
-    const [ tag, op, body ] = found;
+    const [ Tags, op, body ] = found;
     let target = collect, token;
 
     switch (op) {
       case '$' : token = new Immediate(op, body); break;
+      case '_' : token = new Immediate(op, body); break;
 
       case '#' : token = new Action(op, body); break;
       case '~' : token = new Action(op, body); break;
 
-      case ':' : token = new Tags(op, body); break;
-      case '%' : token = new Tags(op, body); break;
-      case '/' : token = new Tags(op, body); break;
+      case ':' : token = new Tag(op, body); break;
+      case '%' : token = new Tag(op, body); break;
+      case '/' : token = new Tag(op, body); break;
 
       case '@' : token = new Tail(op, body); break;
       case '&' : token = new Tail(op, body); break;
       case '!' : token = new Else(op, body); break;
     }
 
-    target.push(source.substring(last, scan.lastIndex - tag.length));
+    target.push(source.substring(last, scan.lastIndex - Tags.length));
     target.push(token);
 
     last = scan.lastIndex;
