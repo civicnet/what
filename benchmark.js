@@ -18,9 +18,9 @@ function human(size) {
 
 // eslint-disable-next-line no-console
 console.log(`
-┌──────────────────┬──────────────┬──────────────┬───────────┬───────────┬─────────────┐
-│       Test       │   Compiled   │   Rendered   │   Input   │  Results  │  Data rate  │
-├──────────────────┼──────────────┼──────────────┼───────────┼───────────┼─────────────┤`);
+┌────────────────┬───────────┬────────────┬──────────┬──────────┬────────────┐
+│      Test      │  Compile  │  Rendered  │ Template │  Output  │ Throughput │
+├────────────────┼───────────┼────────────┼──────────┼──────────┼────────────┤`);
 
 // eslint-disable-next-line no-sync
 fs.readdirSync(samples)
@@ -55,17 +55,17 @@ fs.readdirSync(samples)
 
       setTimeout(() => { clearImmediate(running); rendered /= new Date() - start; done(); }, time);
     })).then(() => {
-      let through = human(1000 * outsize * rendered).padStart(16);
+      let through = human(1000 * outsize * rendered).padStart(15);
 
-      compiled = parseInt(1000 * compiled).toLocaleString().padStart(8);
-      rendered = parseInt(1000 * rendered).toLocaleString().padStart(8);
-      insize   = human(insize).toLocaleString().padStart(16);
-      outsize  = human(outsize).toLocaleString().padStart(16);
+      compiled = parseInt(1000 * compiled).toLocaleString().padStart(6);
+      rendered = parseInt(1000 * rendered).toLocaleString().padStart(7);
+      insize   = human(insize).toLocaleString().padStart(15);
+      outsize  = human(outsize).toLocaleString().padStart(15);
 
 
-      t        = `\x1b[34m${t.padEnd(16)}`;
-      compiled = `\x1b[1;36m${compiled} \x1b[2;35ms⁻¹`;
-      rendered = `\x1b[1;32m${rendered} \x1b[2;35ms⁻¹`;
+      t        = `\x1b[34m${t.padEnd(14)}`;
+      compiled = `\x1b[1;36m${compiled} \x1b[2;35m/s`;
+      rendered = `\x1b[1;32m${rendered} \x1b[2;35m/s`;
       insize   = `\x1b[2;37m${insize}`;
       outsize  = `\x1b[2;37m${outsize}`;
       through  = `\x1b[2;33m${through}/s`;
@@ -79,5 +79,5 @@ fs.readdirSync(samples)
   }, Promise.resolve())
   .then(() => {
     // eslint-disable-next-line no-console
-    console.log('└──────────────────┴──────────────┴──────────────┴───────────┴───────────┴─────────────┘\n');
+    console.log('└────────────────┴───────────┴────────────┴──────────┴──────────┴────────────┘\n');
   });
